@@ -9,6 +9,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       restaurants: [],
+      bars: [],
       category: "",
       coords: []
     };
@@ -27,13 +28,13 @@ class App extends React.Component {
   };
 
   componentDidMount() {
+    let coords = [];
     axios
       .get(
-        "https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38.029649,-78.476841&radius=5000&opennow&type=restaurant&key=+" +
+        "https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38.029649,-78.476841&radius=3000&opennow&type=restaurant&key=+" +
           API_KEY
       )
       .then(response => {
-        let coords = [];
         try {
           for (let i = 0; i < response.data.results.length; i++) {
             coords.push({
@@ -41,7 +42,7 @@ class App extends React.Component {
                 response.data.results[i].geometry.location.lat,
                 response.data.results[i].geometry.location.lng
               ],
-              names: response.data.results[i].name,
+              name: response.data.results[i].name,
               open_now: response.data.results[i].opening_hours.open_now
             });
           }
@@ -54,10 +55,38 @@ class App extends React.Component {
           coords: coords
         });
       });
+
+    axios
+      .get(
+        "https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38.029649,-78.476841&radius=3000&opennow&type=bar&key=+" +
+          API_KEY
+      )
+      .then(response => {
+        try {
+          for (let i = 0; i < response.data.results.length; i++) {
+            coords.push({
+              coordinates: [
+                response.data.results[i].geometry.location.lat,
+                response.data.results[i].geometry.location.lng
+              ],
+              name: response.data.results[i].name,
+              open_now: response.data.results[i].opening_hours.open_now
+            });
+          }
+        } catch (err) {
+          console.log(err);
+        }
+
+        this.setState({
+          bars: response.data.results,
+          coords: coords
+        });
+      });
   }
 
   formatRestaurants = () => {
-    let restaurant_list = this.state.restaurants;
+    let restaurant_list = this.state.restaurants.concat(this.state.bars);
+    console.log(this.state.coords);
 
     return restaurant_list.map(location => {
       try {
