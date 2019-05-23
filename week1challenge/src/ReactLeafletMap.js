@@ -14,11 +14,11 @@ export default class ReactLeafletMap extends React.Component {
     return (
       <div>
         <Map
-          style={{ height: "480px", width: "95%" }}
+          style={{ height: "600px", width: "100%" }}
           zoom={14}
           center={[38.03, -78.48]}
         >
-          <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
 
           {this.props.coords.map(location => {
             return (
@@ -29,6 +29,8 @@ export default class ReactLeafletMap extends React.Component {
                     location["coordinates"][1]
                   ]}
                   radius={5}
+                  fillOpacity={0.6}
+                  color="purple"
                 >
                   <Tooltip direction="right" offset={[-8, -2]} opacity={11}>
                     <span>{location["name"]}</span>

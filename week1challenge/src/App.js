@@ -1,8 +1,10 @@
-import React from "react";
+import React, { createRef } from "react";
 import "./App.css";
 import axios from "axios";
 import ReactLeafletMap from "./ReactLeafletMap.js";
-import { Grid } from "semantic-ui-react";
+import RestaurantList from "./RestaurantList.js";
+import { Affix } from "antd";
+import { Grid, Header, Button, Input, Segment } from "semantic-ui-react";
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 class App extends React.Component {
@@ -52,32 +54,17 @@ class App extends React.Component {
           console.log(err);
         }
 
+        let address = response.data.results.map(
+          location => location.types.vicinity
+        );
+
         this.setState({
           restaurants: response.data.results,
-          coords: coords
+          coords: coords,
+          address: address
         });
       });
   }
-
-  formatRestaurants = () => {
-    let restaurant_list = this.state.restaurants;
-    console.log(this.state.coords);
-
-    return restaurant_list.map(location => {
-      try {
-        if (location.opening_hours.open_now != null)
-          return (
-            <li>
-              <b> Name: </b> {location.name} <b>Rating: </b>
-              {location.rating} <b>Price Level: </b>
-              {location.price_level}
-            </li>
-          );
-      } catch (err) {
-        console.log(err);
-      }
-    });
-  };
 
   handleChange = event => {
     this.setState({
@@ -89,32 +76,48 @@ class App extends React.Component {
     this.componentDidMount();
   };
 
+  contextRef = () => createRef();
+
   render() {
     return (
       <div>
         <Grid divided="true" centered="true">
           <Grid.Column width="7">
-            <input
-              type="text"
-              value={this.state.category}
-              onChange={this.handleChange}
-              placeholder="Cuisine Category"
-            />
-
-            <button name="submitButton" onClick={this.handleClick}>
-              Submit
-            </button>
-
-            {this.formatRestaurants()}
+            <Grid.Row style={{ padding: "1em 0em" }}>
+              <Header
+                as="h3"
+                content="Restauraunt Screener"
+                textAlign="center"
+              />
+            </Grid.Row>
+            <Grid.Column>
+              <Segment>
+                <Grid.Row style={{ padding: "1em 7.5em" }}>
+                  <div class="ui input">
+                    <input
+                      type="text"
+                      value={this.state.category}
+                      onChange={this.handleChange}
+                      placeholder="Cuisine Category..."
+                    />
+                  </div>{" "}
+                  <Button name="submitButton" onClick={this.handleClick}>
+                    Submit
+                  </Button>
+                </Grid.Row>
+              </Segment>
+            </Grid.Column>
+            <RestaurantList restaurants={this.state.restaurants} />
           </Grid.Column>
 
           <Grid.Column width="9">
-            <ReactLeafletMap coords={this.state.coords} />
+            <Affix offsetTop={this.state.top}>
+              <ReactLeafletMap coords={this.state.coords} />
+            </Affix>
           </Grid.Column>
         </Grid>
       </div>
     );
   }
 }
-
 export default App;
