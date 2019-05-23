@@ -14,7 +14,7 @@ export default class ReactLeafletMap extends React.Component {
     return (
       <div>
         <Map
-          style={{ height: "480px", width: "100%" }}
+          style={{ height: "480px", width: "95%" }}
           zoom={14}
           center={[38.03, -78.48]}
         >

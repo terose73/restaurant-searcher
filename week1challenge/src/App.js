@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import axios from "axios";
 import ReactLeafletMap from "./ReactLeafletMap.js";
+import { Grid } from "semantic-ui-react";
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 class App extends React.Component {
@@ -9,7 +10,6 @@ class App extends React.Component {
     super(props);
     this.state = {
       restaurants: [],
-      bars: [],
       category: "",
       coords: []
     };
@@ -31,7 +31,9 @@ class App extends React.Component {
     let coords = [];
     axios
       .get(
-        "https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38.029649,-78.476841&radius=3000&opennow&type=restaurant&key=+" +
+        "https://cors-anywhere-hclaunch.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38.029649,-78.476841&radius=3000&opennow&type=restaurant&name=" +
+          this.state.category +
+          "&key=+" +
           API_KEY
       )
       .then(response => {
@@ -55,37 +57,10 @@ class App extends React.Component {
           coords: coords
         });
       });
-
-    axios
-      .get(
-        "https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38.029649,-78.476841&radius=3000&opennow&type=bar&key=+" +
-          API_KEY
-      )
-      .then(response => {
-        try {
-          for (let i = 0; i < response.data.results.length; i++) {
-            coords.push({
-              coordinates: [
-                response.data.results[i].geometry.location.lat,
-                response.data.results[i].geometry.location.lng
-              ],
-              name: response.data.results[i].name,
-              open_now: response.data.results[i].opening_hours.open_now
-            });
-          }
-        } catch (err) {
-          console.log(err);
-        }
-
-        this.setState({
-          bars: response.data.results,
-          coords: coords
-        });
-      });
   }
 
   formatRestaurants = () => {
-    let restaurant_list = this.state.restaurants.concat(this.state.bars);
+    let restaurant_list = this.state.restaurants;
     console.log(this.state.coords);
 
     return restaurant_list.map(location => {
@@ -117,21 +92,26 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <form>
-          Category
-          <label>
+        <Grid divided="true" centered="true">
+          <Grid.Column width="7">
             <input
               type="text"
               value={this.state.category}
               onChange={this.handleChange}
+              placeholder="Cuisine Category"
             />
-          </label>
-        </form>
-        <button onClick={this.handleClick}>Submit</button>
 
-        {this.formatRestaurants()}
+            <button name="submitButton" onClick={this.handleClick}>
+              Submit
+            </button>
 
-        <ReactLeafletMap coords={this.state.coords} />
+            {this.formatRestaurants()}
+          </Grid.Column>
+
+          <Grid.Column width="9">
+            <ReactLeafletMap coords={this.state.coords} />
+          </Grid.Column>
+        </Grid>
       </div>
     );
   }
