@@ -28,7 +28,7 @@ export default class ReactLeafletMap extends React.Component {
                     location["coordinates"][0],
                     location["coordinates"][1]
                   ]}
-                  radius={5}
+                  radius={6}
                   fillOpacity={0.6}
                   color="purple"
                 >

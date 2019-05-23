@@ -102,12 +102,28 @@ class App extends React.Component {
                     />
                   </div>{" "}
                   <Button name="submitButton" onClick={this.handleClick}>
-                    Submit
+                    Search
                   </Button>
                 </Grid.Row>
               </Segment>
             </Grid.Column>
             <RestaurantList restaurants={this.state.restaurants} />
+            <button class="ui linkedin button">
+              <i class="linkedin icon" />
+              LinkedIn
+            </button>
+            <button class="ui instagram button">
+              <i class="instagram icon" />
+              Instagram
+            </button>
+            <button class="ui youtube button">
+              <i class="youtube icon" />
+              YouTube
+            </button>
+            <button class="ui facebook button">
+              <i class="facebook icon" />
+              Facebook
+            </button>
           </Grid.Column>
 
           <Grid.Column width="9">
