@@ -4,7 +4,7 @@ import axios from "axios";
 import ReactLeafletMap from "./ReactLeafletMap.js";
 import RestaurantList from "./RestaurantList.js";
 import { Affix } from "antd";
-import { Grid, Header, Button, Input, Segment } from "semantic-ui-react";
+import { Grid, Header, Button, Segment } from "semantic-ui-react";
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 class App extends React.Component {

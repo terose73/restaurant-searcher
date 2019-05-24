@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { Map, Marker, CircleMarker, TileLayer, Tooltip } from "react-leaflet";
+import { Map, CircleMarker, TileLayer, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 export default class ReactLeafletMap extends React.Component {

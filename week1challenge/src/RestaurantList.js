@@ -52,7 +52,7 @@ export default class App extends React.Component {
                   <b>Rating </b> {location.rating} <br />
                   <Rating
                     icon="star"
-                    defaultRating={location.rating}
+                    defaultRating={Math.round(location.rating)}
                     maxRating={5}
                   />
                 </Table.Cell>
