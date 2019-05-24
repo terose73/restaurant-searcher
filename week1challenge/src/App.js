@@ -13,7 +13,10 @@ class App extends React.Component {
     this.state = {
       restaurants: [],
       category: "",
-      coords: []
+      coords: [],
+      address: "San Francisco",
+      searchAddress: false,
+      newCoords: [38.029649, -78.476841]
     };
   }
 
@@ -23,50 +26,70 @@ class App extends React.Component {
     });
   };
 
-  handleChange = event => {
+  handleAddress = event => {
     this.setState({
-      value: event.target.value
+      address: event.target.value
     });
   };
 
   componentDidMount() {
     let coords = [];
+
     axios
       .get(
-        "https://cors-anywhere-hclaunch.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38.029649,-78.476841&radius=3000&opennow&type=restaurant&name=" +
-          this.state.category +
-          "&key=+" +
-          API_KEY
+        "https://cors-anywhere-hclaunch.herokuapp.com/https://maps.googleapis.com/maps/api/place/textsearch/json?query=" +
+          this.state.address +
+          "&key=AIzaSyBQRbOl8Z5HnrY12zURP84C6Tdwsoy-HUI"
       )
       .then(response => {
-        try {
-          for (let i = 0; i < response.data.results.length; i++) {
-            coords.push({
-              coordinates: [
-                response.data.results[i].geometry.location.lat,
-                response.data.results[i].geometry.location.lng
-              ],
-              name: response.data.results[i].name,
-              open_now: response.data.results[i].opening_hours.open_now
-            });
-          }
-        } catch (err) {
-          console.log(err);
-        }
-
-        let address = response.data.results.map(
-          location => location.types.vicinity
-        );
+        let address = response.data.results[0].geometry.location;
 
         this.setState({
-          restaurants: response.data.results,
-          coords: coords,
-          address: address
+          newCoords: [address.lat, address.lng],
+          searchAddress: false
         });
+
+        axios
+          .get(
+            "https://cors-anywhere-hclaunch.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+              this.state.newCoords[0] +
+              "," +
+              this.state.newCoords[1] +
+              "&radius=1000&opennow&type=restaurant&name=" +
+              this.state.category +
+              "&key=+" +
+              API_KEY
+          )
+
+          .then(response => {
+            try {
+              console.log(response.data.results);
+              for (let i = 0; i < response.data.results.length; i++) {
+                coords.push({
+                  coordinates: [
+                    response.data.results[i].geometry.location.lat,
+                    response.data.results[i].geometry.location.lng
+                  ],
+                  name: response.data.results[i].name,
+                  open_now: response.data.results[i].opening_hours.open_now
+                });
+              }
+            } catch (err) {
+              console.log(err);
+            }
+
+            this.setState({
+              restaurants: response.data.results,
+              coords: coords
+            });
+
+            console.log(this.state.newCoords[0]);
+            console.log(this.state.newCoords[1]);
+          });
       });
   }
 
-  handleChange = event => {
+  handleCategory = event => {
     this.setState({
       category: event.target.value
     });
@@ -75,8 +98,6 @@ class App extends React.Component {
   handleClick = event => {
     this.componentDidMount();
   };
-
-  contextRef = () => createRef();
 
   render() {
     return (
@@ -97,7 +118,7 @@ class App extends React.Component {
                     <input
                       type="text"
                       value={this.state.category}
-                      onChange={this.handleChange}
+                      onChange={this.handleCategory}
                       placeholder="Cuisine Category..."
                     />
                   </div>{" "}
@@ -107,28 +128,40 @@ class App extends React.Component {
                 </Grid.Row>
               </Segment>
             </Grid.Column>
+            <Grid.Column>
+              <Segment>
+                <Grid.Row style={{ padding: "1em 7.5em" }}>
+                  <div class="ui input">
+                    <input
+                      type="text"
+                      value={this.state.address}
+                      onChange={this.handleAddress}
+                      placeholder="Address..."
+                    />
+                  </div>{" "}
+                  <Button name="submitButton" onClick={this.handleClick}>
+                    Search
+                  </Button>
+                </Grid.Row>
+              </Segment>
+            </Grid.Column>
             <RestaurantList restaurants={this.state.restaurants} />
-            <button class="ui linkedin button">
-              <i class="linkedin icon" />
-              LinkedIn
-            </button>
-            <button class="ui instagram button">
-              <i class="instagram icon" />
-              Instagram
-            </button>
-            <button class="ui youtube button">
-              <i class="youtube icon" />
-              YouTube
-            </button>
-            <button class="ui facebook button">
-              <i class="facebook icon" />
-              Facebook
-            </button>
+            <Grid.Row style={{ padding: "1em 7.5em" }}>
+              <a href="https://www.linkedin.com/in/theodore-rose-315527156/">
+                <button class="ui linkedin button">
+                  <i class="linkedin icon" />
+                  LinkedIn
+                </button>
+              </a>
+            </Grid.Row>
           </Grid.Column>
 
           <Grid.Column width="9">
             <Affix offsetTop={this.state.top}>
-              <ReactLeafletMap coords={this.state.coords} />
+              <ReactLeafletMap
+                coords={this.state.coords}
+                newCoords={this.state.newCoords}
+              />
             </Affix>
           </Grid.Column>
         </Grid>

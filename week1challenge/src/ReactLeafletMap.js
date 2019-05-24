@@ -15,8 +15,8 @@ export default class ReactLeafletMap extends React.Component {
       <div>
         <Map
           style={{ height: "600px", width: "100%" }}
-          zoom={14}
-          center={[38.03, -78.48]}
+          zoom={15}
+          center={[this.props.newCoords[0], this.props.newCoords[1]]}
         >
           <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
 
