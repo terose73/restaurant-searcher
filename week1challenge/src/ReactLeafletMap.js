@@ -32,7 +32,7 @@ export default class ReactLeafletMap extends React.Component {
                   fillOpacity={0.6}
                   color="purple"
                 >
-                  <Tooltip direction="right" offset={[-8, -2]} opacity={11}>
+                  <Tooltip direction="right" offset={[-4, -2]} opacity={11}>
                     <span>{location["name"]}</span>
                   </Tooltip>
                 </CircleMarker>

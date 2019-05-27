@@ -5,7 +5,6 @@ import ReactLeafletMap from "./ReactLeafletMap.js";
 import RestaurantList from "./RestaurantList.js";
 import { Affix } from "antd";
 import { Grid, Header, Button, Segment } from "semantic-ui-react";
-const API_KEY = process.env.REACT_APP_API_KEY;
 
 class App extends React.Component {
   constructor(props) {
@@ -33,60 +32,39 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    let coords = [];
-
     axios
-      .get(
-        "https://cors-anywhere-hclaunch.herokuapp.com/https://maps.googleapis.com/maps/api/place/textsearch/json?query=" +
-          this.state.address +
-          "&key=AIzaSyBQRbOl8Z5HnrY12zURP84C6Tdwsoy-HUI"
-      )
+      .get("/api/geocode?address=" + this.state.address)
       .then(response => {
         let address = response.data.results[0].geometry.location;
 
-        this.setState({
-          newCoords: [address.lat, address.lng],
-          searchAddress: false
+        return new Promise(resolve => {
+          this.setState(
+            {
+              newCoords: [address.lat, address.lng],
+              searchAddress: false
+            },
+            () => resolve()
+          );
         });
-
-        axios
-          .get(
-            "https://cors-anywhere-hclaunch.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-              this.state.newCoords[0] +
-              "," +
-              this.state.newCoords[1] +
-              "&radius=1000&opennow&type=restaurant&name=" +
-              this.state.category +
-              "&key=+" +
-              API_KEY
-          )
-
-          .then(response => {
-            try {
-              console.log(response.data.results);
-              for (let i = 0; i < response.data.results.length; i++) {
-                coords.push({
-                  coordinates: [
-                    response.data.results[i].geometry.location.lat,
-                    response.data.results[i].geometry.location.lng
-                  ],
-                  name: response.data.results[i].name,
-                  open_now: response.data.results[i].opening_hours.open_now
-                });
-              }
-            } catch (err) {
-              console.log(err);
-            }
-
-            this.setState({
-              restaurants: response.data.results,
-              coords: coords
-            });
-
-            console.log(this.state.newCoords[0]);
-            console.log(this.state.newCoords[1]);
-          });
-      });
+      })
+      .then(() => {
+        return axios.get(
+          "/api/find?lat=" +
+            this.state.newCoords[0] +
+            "&lng=" +
+            this.state.newCoords[1] +
+            "&category=" +
+            this.state.category
+        );
+      })
+      .then(response => {
+        let holder = response.data;
+        this.setState({
+          restaurants: holder["restaurants"],
+          coords: holder["coords"]
+        });
+      })
+      .catch(e => console.log(e));
   }
 
   handleCategory = event => {
@@ -146,7 +124,7 @@ class App extends React.Component {
               </Segment>
             </Grid.Column>
             <RestaurantList restaurants={this.state.restaurants} />
-            <Grid.Row style={{ padding: "1em 7.5em" }}>
+            <Grid.Row>
               <a href="https://www.linkedin.com/in/theodore-rose-315527156/">
                 <button class="ui linkedin button">
                   <i class="linkedin icon" />
