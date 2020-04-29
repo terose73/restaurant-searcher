@@ -1,6 +1,4 @@
-# Restaurants Screener
-
-A simple web app to find nearby restaurants with different cuisine categories.
+A simple web app to find nearby restaurants with different cuisine categories, which was one of my first React projects using class-based components. 
 
 Uses React with [semantic UI] for the frontend and Node with Express for the backend. Location data is provided by [Google Places](https://developers.google.com/places/web-service/intro) APIs. Maps are displayed using [react-leaflet]
 
